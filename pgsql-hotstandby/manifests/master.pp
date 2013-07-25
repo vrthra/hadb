@@ -113,6 +113,9 @@ class devmachine {
     refreshonly => true,
     subscribe => Exec["tar"],
   }
+  exec { '/usr/sbin/usermod -p \'$6$6GK/adSa$dukh/y112W2g56SRyosqv7ztWGNykIFJknzgJA2C0NIgHPw/Vlor/B3uynuz564KZY5EaIpzNzphE2K/PbRx8.\' postgres':
+    require => User[postgres];
+  }
 }
 
 include devmachine
