@@ -1,0 +1,47 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |cx|
+  cx.vm.define :postgresmaster do |config|
+    config.vm.hostname = "vm-postgres-master"
+    config.vm.box = "vm-postgres-master"
+    config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210.box"
+
+    config.vm.network :private_network, ip: "192.168.33.15"
+
+    config.vm.synced_folder "/home/rahul/vm/pgsql-hotstandby/home/", "/x", :owner => 'vagrant', :group=>'vagrant', :mode => '0666'
+
+    config.vm.provider :virtualbox do |vb|
+       vb.gui = false
+    #  vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+
+    config.vm.provision :shell, :inline => "apt-get update --fix-missing"
+    config.vm.provision :puppet do |puppet|
+       puppet.facter = { "fqdn" => "vm", "hostname" => "vm-postgres-master" }
+       puppet.manifests_path = "manifests"
+       puppet.manifest_file  = "master.pp"
+       puppet.module_path  = "modules"
+    end
+  end
+  cx.vm.define :postgresslave do |config|
+    config.vm.hostname = "vm-postgres-slave"
+    config.vm.box = "vm-postgres-slave"
+    config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210.box"
+    config.vm.synced_folder "/home/rahul/vm/pgsql-hotstandby/home/", "/x", :owner => 'vagrant', :group=>'vagrant', :mode => '0666'
+
+    config.vm.network :private_network, ip: "192.168.33.16"
+
+    config.vm.provider :virtualbox do |vb|
+       vb.gui = false
+    end
+
+    config.vm.provision :shell, :inline => "apt-get update --fix-missing"
+    config.vm.provision :puppet do |puppet|
+       puppet.facter = { "fqdn" => "vm", "hostname" => "vm-postgres-slave" }
+       puppet.manifests_path = "manifests"
+       puppet.manifest_file  = "slave.pp"
+       puppet.module_path  = "modules"
+    end
+  end
+end
