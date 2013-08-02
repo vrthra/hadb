@@ -12,7 +12,8 @@ init:
 	rm -f $(myscript) $(myscript).*
 	$(vagrant) up
 
-reinstall:
+clobber:
+	$(vagrant) destroy -f
 
 sign:
 	echo "/opt/puppet/bin/puppet agent -t -w 60" |tee $(myscript).vm-pgmaster > $(myscript).vm-pgslave
