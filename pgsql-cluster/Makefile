@@ -1,5 +1,5 @@
 vagrant=/usr/bin/vagrant
-myscript=home/.myscript.sh
+myscript=./home/.myscript.sh
 
 init:
 	rm -f $(myscript)
