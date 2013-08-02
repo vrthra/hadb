@@ -3,6 +3,8 @@
 myscript= /vagrant/home/.myscript.sh
 [ -f $myscript ] && exec $myscript $*
 
+service iptables stop
+
 echo pre-yum.$1 >> /vagrant/progress
 for i in openssh-server git zsh vim-minimal
 do
