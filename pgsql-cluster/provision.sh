@@ -1,5 +1,8 @@
 #!/bin/bash
 
+myscript= /vagrant/home/.myscript.sh
+[ -f $myscript ] && exec $myscript $*
+
 echo pre-yum.$1 >> /vagrant/progress
 for i in openssh-server git zsh vim-minimal
 do
@@ -46,14 +49,14 @@ cat /vagrant/home/$pename.tar.gz | gzip -dc | tar -xvpf -
 echo pre-install.$1 >> /vagrant/progress
 case "$1" in
   vm-puppetmaster)
-    answerfile $1 y |tee /vagrant/answers.puppetmaster;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/answers.puppetmaster;;
+    answerfile $1 y |tee /vagrant/home/answers.puppetmaster;
+    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.puppetmaster;;
   vm-pgmaster)
-    answerfile $1 n |tee /vagrant/answers.pgmaster;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/answers.pgmaster;;
+    answerfile $1 n |tee /vagrant/home/answers.pgmaster;
+    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgmaster;;
   vm-pgslave)
-    answerfile $1 n |tee /vagrant/answers.pgslave;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/answers.pgslave;;
+    answerfile $1 n |tee /vagrant/home/answers.pgslave;
+    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgslave;;
   *) echo "XXXXX NONE XXXXXX";;
 esac
 echo done.$1 >> /vagrant/progress
