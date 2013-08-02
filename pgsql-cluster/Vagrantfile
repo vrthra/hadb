@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |cx|
+  [
+    {:name => 'vm-puppetmaster', :ip => '192.168.33.21'},
+    {:name => 'vm-pgmaster', :ip => '192.168.33.22'},
+    {:name => 'vm-pgslave', :ip => '192.168.33.23'}
+  ].each do |info|
+    p info
+    cx.vm.define info[:name].to_sym do |config|
+      config.vm.hostname = info[:name]
+      config.vm.box = info[:name]
+      config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
+      config.vm.network :private_network, ip: info[:ip]
+      config.vm.provider :virtualbox do |vb|
+         vb.gui = false
+         vb.customize ["modifyvm", :id, "--memory", "1024"]
+      end
+      rpms = "libevent-1.4.13-4.el6.x86_64.rpm tmux-1.6-1.el5.rf.x86_64.rpm"
+      config.vm.provision :shell, :inline => %[cd /vagrant/home; rpm -ivh #{rpms}|true]
+      config.vm.provision :shell do |shell|
+        shell.inline = %[/usr/bin/tmux new-session -d '/vagrant/provision.sh #{info[:name]}']
+      end
+    end
+  end
+end
+
