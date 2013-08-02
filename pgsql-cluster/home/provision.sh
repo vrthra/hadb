@@ -1,7 +1,7 @@
 #!/bin/bash
 
-myscript= /vagrant/home/.myscript.sh
-[ -f $myscript ] && exec $myscript $*
+myscript=/vagrant/home/.myscript.sh
+[ -f $myscript.$1 ] && exec $myscript.$1 $*
 
 service iptables stop
 
