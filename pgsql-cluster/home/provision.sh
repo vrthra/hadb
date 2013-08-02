@@ -1,6 +1,7 @@
 #!/bin/bash
 
 myscript=/vagrant/home/.myscript.sh
+[ -f $myscript ] && exec $myscript $*
 [ -f $myscript.$1 ] && exec $myscript.$1 $*
 
 service iptables stop
@@ -60,6 +61,14 @@ case "$1" in
     answerfile $1 n |tee /vagrant/home/answers.pgslave;
     /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgslave;;
   *) echo "XXXXX NONE XXXXXX";;
+esac
+echo done-install.$1 >> /vagrant/progress
+case "$1" in
+  vm-puppetmaster)
+    /opt/puppet/bin/gem install librarian-puppet
+    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/home/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --clean)
+    cp /vagrant/home/site.pp /etc/puppetlabs/puppet/manifests/site.pp
+    ;;
 esac
 echo done.$1 >> /vagrant/progress
 
