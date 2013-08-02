@@ -13,10 +13,10 @@ Vagrant.configure("2") do |cx|
 
     config.vm.provider :virtualbox do |vb|
        vb.gui = false
-    #  vb.customize ["modifyvm", :id, "--memory", "1024"]
+       vb.customize ["modifyvm", :id, "--memory", "1024"]
     end
 
-    #config.vm.provision :shell, :inline => "apt-get update --fix-missing"
+    config.vm.provision :shell, :inline => "rpm -Uvh http://yum.pgrpms.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-6.noarch.rpm||true"
     config.vm.provision :puppet do |puppet|
        puppet.facter = { "fqdn" => "vm", "hostname" => "vm-postgres-master" }
        puppet.manifests_path = "manifests"
@@ -34,9 +34,10 @@ Vagrant.configure("2") do |cx|
 
     config.vm.provider :virtualbox do |vb|
        vb.gui = false
+       vb.customize ["modifyvm", :id, "--memory", "1024"]
     end
 
-    #config.vm.provision :shell, :inline => "apt-get update --fix-missing"
+    config.vm.provision :shell, :inline => "rpm -Uvh http://yum.pgrpms.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-6.noarch.rpm||true"
     config.vm.provision :puppet do |puppet|
        puppet.facter = { "fqdn" => "vm", "hostname" => "vm-postgres-slave" }
        puppet.manifests_path = "manifests"

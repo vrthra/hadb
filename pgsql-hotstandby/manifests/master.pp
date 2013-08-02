@@ -5,39 +5,43 @@ class devmachine {
   package { 'java-1.7.0-openjdk':
     ensure => 'latest',
   }
-
   package { 'openssh-server':
     ensure => 'latest',
   }
-
   package { 'git':
     ensure => 'latest',
   }
-
   package { 'zsh':
     ensure => 'latest',
   }
-  package { 'postgresql-server':
-    ensure => 'latest',
-  }
-  package { 'postgresql-contrib':
-    ensure => 'latest',
-  }
-  package { 'postgresql-devel':
-    ensure => 'latest',
-  }
+  #package { 'postgresql':
+  #  ensure => 'purged',
+  #}
+
+  #package { 'postgresql92':
+  #  ensure => 'latest',
+  #}
+  #package { 'postgresql92-devel':
+  #  ensure => 'latest',
+  #}
+  #package { 'postgresql92-server':
+  #  ensure => 'latest',
+  #}
+  #package { 'postgresql92-libs':
+  #  ensure => 'latest',
+  #}
+  #package { 'postgresql92-contrib':
+  #  ensure => 'latest',
+  #}
+
   package { 'ruby-shadow':
     ensure => 'installed',
   }
 
- user { 'postgres':
+ user { 'rahul':
   ensure => 'present',
-  groups => ['wheel', 'postgres'],
  }
 
- group { 'postgres':
-  ensure => 'present',
- }
 
   host { 'vm-postgres-master':
     ensure => 'present',
@@ -51,12 +55,12 @@ class devmachine {
     target => '/etc/hosts',
     host_aliases => ['vm-postgres-slave.vm'],
   }
-  exec { '/usr/sbin/usermod -p \'$6$6GK/adSa$dukh/y112W2g56SRyosqv7ztWGNykIFJknzgJA2C0NIgHPw/Vlor/B3uynuz564KZY5EaIpzNzphE2K/PbRx8.\' postgres':
-    require => User[postgres];
+  exec { '/usr/sbin/usermod -p \'$6$6GK/adSa$dukh/y112W2g56SRyosqv7ztWGNykIFJknzgJA2C0NIgHPw/Vlor/B3uynuz564KZY5EaIpzNzphE2K/PbRx8.\' rahul':
+    require => User[rahul];
   }
-  file {'/etc/sudoers.d/postgres':
+  file {'/etc/sudoers.d/rahul':
    ensure => file,
-   content => 'postgres        ALL=(ALL)       NOPASSWD: ALL
+   content => 'rahul        ALL=(ALL)       NOPASSWD: ALL
 '
   }
 }
