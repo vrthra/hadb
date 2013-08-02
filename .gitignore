@@ -1,0 +1,4 @@
+pgsql-cluster/home/
+pgsql-cluster/.vagrant/
+pgsql-hotstandby/home/
+pgsql-hotstandby/.vagrant/
