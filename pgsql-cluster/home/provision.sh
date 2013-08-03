@@ -73,4 +73,4 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/progress
 echo "Going to sleep $1"
-sleep 3600
+bash
