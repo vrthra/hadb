@@ -66,9 +66,11 @@ echo done-install.$1 >> /vagrant/progress
 case "$1" in
   vm-puppetmaster)
     /opt/puppet/bin/gem install librarian-puppet
-    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/home/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --clean)
+    export PATH=/opt/puppet/bin:$PATH
+    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/home/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/home/site.pp /etc/puppetlabs/puppet/manifests/site.pp
     ;;
 esac
 echo done.$1 >> /vagrant/progress
-
+echo "Going to sleep $1"
+sleep 3600
