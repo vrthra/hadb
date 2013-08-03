@@ -69,8 +69,22 @@ case "$1" in
     export PATH=/opt/puppet/bin:$PATH
     ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/home/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/home/site.pp /etc/puppetlabs/puppet/manifests/site.pp
+     while true;
+     do echo "wait for sign:";
+        /opt/puppet/bin/puppet cert list
+        /opt/puppet/bin/puppet cert sign vm-pgmaster vm-pgslave
+        sleep 10
+     done
     ;;
+  *)
+   while true;
+   do echo "wait for sign:";
+      /opt/puppet/bin/puppet agent -t -w 60
+      sleep 10
+   done
+   ;;
 esac
 echo done.$1 >> /vagrant/progress
-echo "Going to sleep $1"
-bash
+echo "Shell for $1"
+/bin/env PS1='| ' bash
+
