@@ -10,7 +10,7 @@ Vagrant.configure("2") do |cx|
     p info
     cx.vm.define info[:name].to_sym do |config|
       config.vm.hostname = info[:name]
-      config.vm.box = info[:name]
+      config.vm.box = 'centos-64-x64-vbox4210-nocm'
       config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-64-x64-vbox4210-nocm.box'
       config.vm.network :private_network, ip: info[:ip]
       config.vm.provider :virtualbox do |vb|
