@@ -52,18 +52,18 @@ cat /vagrant/home/$pename.tar.gz | gzip -dc | tar -xvpf -
 echo pre-install.$1 >> /vagrant/home/progress
 case "$1" in
   vm-puppetmaster)
-    answerfile $1 y |tee /vagrant/home/answers.puppetmaster;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.puppetmaster;;
+    answerfile $1 y |tee /home/vagrant/answers.puppetmaster;
+    /home/vagrant/$pename/puppet-enterprise-installer -a /home/vagrant/answers.puppetmaster;;
   vm-pgmaster)
-    answerfile $1 n |tee /vagrant/home/answers.pgmaster;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgmaster;;
+    answerfile $1 n |tee /home/vagrant/answers.pgmaster;
+    /home/vagrant/$pename/puppet-enterprise-installer -a /home/vagrant/answers.pgmaster;;
   vm-pgslave)
-    answerfile $1 n |tee /vagrant/home/answers.pgslave;
-    /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgslave;;
+    answerfile $1 n |tee /home/vagrant/answers.pgslave;
+    /home/vagrant/$pename/puppet-enterprise-installer -a /home/vagrant/answers.pgslave;;
   *) echo "XXXXX NONE XXXXXX"; exit 1;;
 esac
-rm -rf /vagrant/home/modules
-mv /opt/puppet/share/puppet/modules /vagrant/home/modules
+rm -rf /home/vagrant/modules
+mv /opt/puppet/share/puppet/modules /home/vagrant/modules
 echo done-install.$1 >> /vagrant/home/progress
 case "$1" in
   vm-puppetmaster)

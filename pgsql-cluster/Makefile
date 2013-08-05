@@ -9,6 +9,7 @@ bintmux=tmux-1.6-1.el5.rf.x86_64.rpm
 rpmforge=http://apt.sw.be/redhat/el5/en/x86_64/rpmforge/RPMS/
 centospkg=http://mirror.centos.org/centos/6/os/x86_64/Packages/
 
+home: ; mkdir -p $@
 
 update:
 	echo > progress
@@ -16,11 +17,11 @@ update:
 	chmod +x $(myscript)
 	$(vagrant) provision
 
-home/$(libevent):
+home/$(libevent): home
 	curl -L '$(centospkg)/$(libevent)' > home/$(libevent)
 home/$(bintmux): home/$(libevent)
 	curl -L '$(rpmforge)/$(bintmux)' > home/$(bintmux)
-home/$(pename).tar.gz:
+home/$(pename).tar.gz: home
 	curl -L '$(peurl)' > home/$(pename).tar.gz
 
 etc/modules/postgresql/.git:
@@ -38,5 +39,8 @@ init: home/$(pename).tar.gz mymodules home/$(bintmux)
 
 clobber:
 	$(vagrant) destroy -f
-	rm -rf home/modules
+	rm -rf home
 
+clean:
+	$(vagrant) destroy -f
+	rm -rf home/modules
