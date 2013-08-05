@@ -1,5 +1,5 @@
-mod 'pe_postgresql',         :path => '/vagrant/etc/modules/puppetlabs-pe_postgresql'
-mod 'postgresql',            :path => '/vagrant/etc/modules/puppetlabs-postgresql'
+mod 'pe_postgresql',         :path => '/vagrant/etc/modules/pe_postgresql'
+mod 'postgresql',            :path => '/vagrant/etc/modules/postgresql'
 mod 'pe_mcollective',        :path => '/home/vagrant/modules/pe_mcollective'
 mod 'pe_accounts',           :path => '/home/vagrant/modules/pe_accounts'
 mod 'apt',                   :path => '/home/vagrant/modules/apt'
