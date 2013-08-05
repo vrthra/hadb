@@ -39,7 +39,7 @@ init: home/$(pename).tar.gz mymodules home/$(bintmux)
 
 clobber:
 	$(vagrant) destroy -f
-	rm -rf home
+	rm -rf home .vagrant
 
 clean:
 	$(vagrant) destroy -f
