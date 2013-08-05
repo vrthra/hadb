@@ -65,29 +65,31 @@ esac
 rm -rf /home/vagrant/modules
 mv /opt/puppet/share/puppet/modules /home/vagrant/modules
 echo done-install.$1 >> /vagrant/home/progress
+rpm -ivh /home/vagrant/$pename/packages/el-6-x86_64/pe-postgresql-*
 case "$1" in
   vm-puppetmaster)
     /opt/puppet/bin/gem install librarian-puppet
     export PATH=/opt/puppet/bin:$PATH
     ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/etc/site.pp /etc/puppetlabs/puppet/manifests/site.pp
-     while true;
+     (while true;
      do echo "wait for sign:";
-        /opt/puppet/bin/puppet cert list
-        /opt/puppet/bin/puppet cert sign vm-pgmaster vm-pgslave
-        sleep 10
-     done
+        case $(/opt/puppet/bin/puppet cert list | wc -l) in
+           2) /opt/puppet/bin/puppet cert sign vm-pgmaster vm-pgslave; exit 0;;
+           *) sleep 10;;
+        esac
+     done)
     ;;
   *)
-   while true;
+   (while true;
    do echo "wait for sign:";
-      /opt/puppet/bin/puppet agent -t -w 60
+      /opt/puppet/bin/puppet agent -t -w 10;
+      /opt/puppet/bin/puppet agent -t && exit 0;
       sleep 10
-   done
+   done)
    ;;
 esac
 echo done.$1 >> /vagrant/home/progress
-rpm -ivh /home/vagrant/$pename/packages/el-6-x86_64/pe-postgresql-*
 echo "Shell for $1"
 /bin/env PS1='| ' bash
 
