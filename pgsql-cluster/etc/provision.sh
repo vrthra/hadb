@@ -87,6 +87,7 @@ case "$1" in
    ;;
 esac
 echo done.$1 >> /vagrant/home/progress
+rpm -ivh /home/vagrant/$pename/packages/el-6-x86_64/pe-postgresql-*
 echo "Shell for $1"
 /bin/env PS1='| ' bash
 
