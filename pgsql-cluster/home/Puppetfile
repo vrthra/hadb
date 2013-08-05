@@ -1,4 +1,4 @@
-mod 'pe_postgresql', :path => '/home/vagrant/x/puppetlabs-pe_postgresql'
+mod 'pe_postgresql', :path => '/vagrant/home/puppetlabs-pe_postgresql'
 mod 'postgresql',    :git => 'git://github.com/vrthra/puppetlabs-postgresql', :ref => 'postgresql/pgconf'
 mod 'pe_mcollective', :path => '/vagrant/home/modules/pe_mcollective'
 mod 'pe_accounts', :path => '/vagrant/home/modules/pe_accounts'
