@@ -9,3 +9,7 @@ node 'vm-pgslave' {
 #    node_type => 'slave',
 #  }
 }
+
+node 'vm-puppetmaster' {
+
+}
