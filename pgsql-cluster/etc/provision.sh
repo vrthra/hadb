@@ -6,12 +6,12 @@ myscript=/vagrant/home/.myscript.sh
 
 service iptables stop
 
-echo pre-yum.$1 >> /vagrant/progress
+echo pre-yum.$1 >> /vagrant/home/progress
 for i in openssh-server git zsh vim-minimal
 do
   yum install -y $i
 done
-echo post-yum.$1 >> /vagrant/progress
+echo post-yum.$1 >> /vagrant/home/progress
 
 cat <<EOF >> /etc/hosts
 192.168.33.21 vm-puppetmaster
@@ -49,7 +49,7 @@ EOF
 pename=puppet-enterprise-3.0.0-el-6-x86_64
 cat /vagrant/home/$pename.tar.gz | gzip -dc | tar -xvpf -
 
-echo pre-install.$1 >> /vagrant/progress
+echo pre-install.$1 >> /vagrant/home/progress
 case "$1" in
   vm-puppetmaster)
     answerfile $1 y |tee /vagrant/home/answers.puppetmaster;
@@ -60,15 +60,17 @@ case "$1" in
   vm-pgslave)
     answerfile $1 n |tee /vagrant/home/answers.pgslave;
     /vagrant/home/$pename/puppet-enterprise-installer -a /vagrant/home/answers.pgslave;;
-  *) echo "XXXXX NONE XXXXXX";;
+  *) echo "XXXXX NONE XXXXXX"; exit 1;;
 esac
-echo done-install.$1 >> /vagrant/progress
+rm -rf /vagrant/home/modules
+mv /opt/puppet/share/puppet/modules /vagrant/home/modules
+echo done-install.$1 >> /vagrant/home/progress
 case "$1" in
   vm-puppetmaster)
     /opt/puppet/bin/gem install librarian-puppet
     export PATH=/opt/puppet/bin:$PATH
-    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/home/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
-    cp /vagrant/home/site.pp /etc/puppetlabs/puppet/manifests/site.pp
+    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
+    cp /vagrant/etc/site.pp /etc/puppetlabs/puppet/manifests/site.pp
      while true;
      do echo "wait for sign:";
         /opt/puppet/bin/puppet cert list
@@ -84,7 +86,7 @@ case "$1" in
    done
    ;;
 esac
-echo done.$1 >> /vagrant/progress
+echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
 /bin/env PS1='| ' bash
 
