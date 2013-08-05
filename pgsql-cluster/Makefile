@@ -30,6 +30,10 @@ etc/modules/postgresql/.git:
 etc/modules/pe_postgresql/.git:
 	git clone $(githubuser)/puppetlabs-pe_postgresql.git etc/modules/pe_postgresql
 
+moduleupdate:
+	cd etc/modules/postgresql; git checkout postgresql/pgconf
+	cd etc/modules/pe_postgresql; git checkout pgsql/cluster
+
 mymodules: etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
 
 init: home/$(pename).tar.gz mymodules home/$(bintmux)
