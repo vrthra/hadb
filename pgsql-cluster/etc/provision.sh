@@ -72,7 +72,13 @@ case "$1" in
     export PATH=/opt/puppet/bin:$PATH
     ( cd /opt/puppet/share/puppet; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/etc/site.pp /etc/puppetlabs/puppet/manifests/site.pp
-    echo '*' > /etc/puppetlabs/puppet/autosign.conf
+    (while true;
+    do echo "wait for sign:";
+        case $(/opt/puppet/bin/puppet cert list | wc -l) in
+           2) /opt/puppet/bin/puppet cert sign vm-pgmaster vm-pgslave; exit 0;;
+           *) sleep 10;;
+        esac
+    done)
     ;;
   *)
    (while true;
@@ -87,7 +93,7 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
-echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --no-daemonize" > /home/vagrant/start-agent.sh
-echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --no-daemonize" > /home/vagrant/start-master.sh
+echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --verobse --no-daemonize" > /home/vagrant/start-agent.sh
+echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --verobse --no-daemonize" > /home/vagrant/start-master.sh
 chmod +x /home/vagrant/start-*.sh
 /bin/env p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet PATH=/opt/puppet/bin:$PATH PS1="$1# " bash
