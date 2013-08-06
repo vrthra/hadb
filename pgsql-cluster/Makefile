@@ -57,3 +57,7 @@ clean:
 	$(vagrant) destroy -f
 	rm -rf home/modules
 
+modulereinit:
+	vagrant ssh vm-puppetmaster -c 'sudo rm -rf /opt/puppet/share/puppet/modules /opt/puppet/share/puppet/Puppetfile.*'
+	vagrant ssh vm-puppetmaster -c 'cd /opt/puppet/share/puppet; sudo /opt/puppet/bin/librarian-puppet install'
+
