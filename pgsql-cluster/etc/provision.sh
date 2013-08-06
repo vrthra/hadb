@@ -91,5 +91,6 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
+service pe-puppet stop
 /bin/env PATH=/opt/puppet/bin:$PATH PS1='| ' bash
 
