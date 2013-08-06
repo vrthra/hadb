@@ -70,15 +70,9 @@ case "$1" in
   vm-puppetmaster)
     /opt/puppet/bin/gem install librarian-puppet
     export PATH=/opt/puppet/bin:$PATH
-    ( cd /opt/puppet/share/puppet; rm -rf modules.old; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
+    ( cd /opt/puppet/share/puppet; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/etc/site.pp /etc/puppetlabs/puppet/manifests/site.pp
-     (while true;
-     do echo "wait for sign:";
-        case $(/opt/puppet/bin/puppet cert list | wc -l) in
-           2) /opt/puppet/bin/puppet cert sign vm-pgmaster vm-pgslave; exit 0;;
-           *) sleep 10;;
-        esac
-     done)
+    echo '*' > /etc/puppetlabs/puppet/autosign.conf
     ;;
   *)
    (while true;
@@ -87,10 +81,14 @@ case "$1" in
       /opt/puppet/bin/puppet agent -t && exit 0;
       sleep 10
    done)
+    # We dont stop puppetmaster because we dont know when the agents would request for signing.
+    /sbin/service pe-puppet stop;
    ;;
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
 service pe-puppet stop
-/bin/env PATH=/opt/puppet/bin:$PATH PS1='| ' bash
-
+echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --no-daemonize" > /home/vagrant/start-agent.sh
+echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --no-daemonize" > /home/vagrant/start-master.sh
+chmod +x /home/vagrant/start-*.sh
+/bin/env p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet PATH=/opt/puppet/bin:$PATH PS1="$1# " bash
