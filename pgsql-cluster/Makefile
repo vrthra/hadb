@@ -50,8 +50,8 @@ clobber:
 	rm -rf home .vagrant
 
 destroyvms:
-	for i in $(VBoxManage list runningvms | sed -e 's#"##g' | cut -d\  -f1); do VBoxManage controlvm $i poweroff; done
-	for i in $(VBoxManage list vms | sed -e 's#"##g'| cut -d\  -f1); do VBoxManage unregistervm $i --delete; done
+	@for i in $$(VBoxManage list runningvms | sed -e 's#"##g' | awk -F\  '/pgsql-/{print $$1;}'); do echo VBoxManage controlvm $$i poweroff; done
+	@for i in $$(VBoxManage list vms | sed -e 's#"##g'| awk -F\  '/pgsql-/{print $$1;}'); do echo VBoxManage unregistervm $$i --delete; done
 
 clean:
 	$(vagrant) destroy -f
