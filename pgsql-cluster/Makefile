@@ -9,6 +9,8 @@ bintmux=tmux-1.6-1.el5.rf.x86_64.rpm
 rpmforge=http://apt.sw.be/redhat/el5/en/x86_64/rpmforge/RPMS/
 centospkg=http://mirror.centos.org/centos/6/os/x86_64/Packages/
 
+.PRECIOUS: home/$(pename).tar.gz mymodules home/$(bintmux) home/$(libevent)
+
 home: ; mkdir -p $@
 
 update:
