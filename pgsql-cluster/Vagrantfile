@@ -15,7 +15,7 @@ Vagrant.configure("2") do |cx|
       config.vm.network :private_network, ip: info[:ip]
       config.vm.provider :virtualbox do |vb|
          vb.gui = false
-         vb.customize ["modifyvm", :id, "--memory", "1024"]
+         vb.customize ["modifyvm", :id, "--memory", info[:mem]]
       end
       rpms = "libevent-1.4.13-4.el6.x86_64.rpm tmux-1.6-1.el5.rf.x86_64.rpm"
       config.vm.provision :shell, :inline => %[cd /vagrant/home; /bin/rpm -ivh #{rpms}|true]
