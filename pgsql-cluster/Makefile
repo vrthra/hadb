@@ -26,13 +26,15 @@ home/$(pename).tar.gz: home
 
 etc/modules/postgresql/.git:
 	git clone $(githubuser)/puppetlabs-postgresql.git etc/modules/postgresql
+	cd etc/modules/postgresql; git checkout postgresql/pgconf
 
 etc/modules/pe_postgresql/.git:
 	git clone $(githubuser)/puppetlabs-pe_postgresql.git etc/modules/pe_postgresql
+	cd etc/modules/pe_postgresql; git checkout pgsql/cluster
 
 moduleupdate:
-	cd etc/modules/postgresql; git checkout postgresql/pgconf
-	cd etc/modules/pe_postgresql; git checkout pgsql/cluster
+	cd etc/modules/pe_postgresql; git stash; git pull --rebase origin pgsql/cluster
+	cd etc/modules/postgresql; git stash; git pull --rebase postgresql/pgconf
 
 mymodules: | etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
 
@@ -45,6 +47,11 @@ clobber:
 	$(vagrant) destroy -f
 	rm -rf home .vagrant
 
+destroyvms:
+	for i in $(VBoxManage list runningvms | sed -e 's#"##g' | cut -d\  -f1); do VBoxManage controlvm $i poweroff; done
+	for i in $(VBoxManage list vms | sed -e 's#"##g'| cut -d\  -f1); do VBoxManage unregistervm $i --delete; done
+
 clean:
 	$(vagrant) destroy -f
 	rm -rf home/modules
+
