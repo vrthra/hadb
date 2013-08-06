@@ -93,7 +93,7 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
-echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --verobse --no-daemonize" > /home/vagrant/start-agent.sh
-echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --verobse --no-daemonize" > /home/vagrant/start-master.sh
+echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --verbose --no-daemonize --logdest=/home/vagrant/agent.log" > /home/vagrant/start-agent.sh
+echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --verbose --logdest=/home/vagrant/master.log --no-daemonize" > /home/vagrant/start-master.sh
 chmod +x /home/vagrant/start-*.sh
 /bin/env p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet PATH=/opt/puppet/bin:$PATH PS1="$1# " bash
