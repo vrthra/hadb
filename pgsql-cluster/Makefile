@@ -17,7 +17,7 @@ update:
 	chmod +x $(myscript)
 	$(vagrant) provision
 
-home/$(libevent): home
+home/$(libevent): | home
 	curl -L '$(centospkg)/$(libevent)' > home/$(libevent)
 home/$(bintmux): home/$(libevent)
 	curl -L '$(rpmforge)/$(bintmux)' > home/$(bintmux)
@@ -34,7 +34,7 @@ moduleupdate:
 	cd etc/modules/postgresql; git checkout postgresql/pgconf
 	cd etc/modules/pe_postgresql; git checkout pgsql/cluster
 
-mymodules: etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
+mymodules: | etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
 
 init: home/$(pename).tar.gz mymodules home/$(bintmux)
 	echo > progress
