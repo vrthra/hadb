@@ -87,7 +87,6 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
-service pe-puppet stop
 echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --no-daemonize" > /home/vagrant/start-agent.sh
 echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --no-daemonize" > /home/vagrant/start-master.sh
 chmod +x /home/vagrant/start-*.sh
