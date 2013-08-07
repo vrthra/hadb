@@ -28,15 +28,15 @@ home/$(pename).tar.gz: home
 
 etc/modules/postgresql/.git:
 	git clone $(githubuser)/puppetlabs-postgresql.git etc/modules/postgresql
-	cd etc/modules/postgresql; git checkout postgresql/pgconf
+	cd etc/modules/postgresql; git checkout pgsql/refactor
 
 etc/modules/pe_postgresql/.git:
 	git clone $(githubuser)/puppetlabs-pe_postgresql.git etc/modules/pe_postgresql
-	cd etc/modules/pe_postgresql; git checkout pgsql/cluster
+	cd etc/modules/pe_postgresql; git checkout pgsql/refactor
 
 moduleupdate:
-	cd etc/modules/pe_postgresql; git stash; git pull --rebase origin pgsql/cluster
-	cd etc/modules/postgresql; git stash; git pull --rebase postgresql/pgconf
+	cd etc/modules/pe_postgresql; git stash; git pull --rebase origin pgsql/refactor
+	cd etc/modules/postgresql; git stash; git pull --rebase pgsql/refactor
 
 mymodules: | etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
 
