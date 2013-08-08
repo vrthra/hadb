@@ -98,5 +98,5 @@ echo "Shell for $1"
 echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --verbose --no-daemonize 2>&1 | tee /home/vagrant/agent.log" > /home/vagrant/start-agent.sh
 echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --verbose --no-daemonize 2>&1 | tee /home/vagrant/master.log" > /home/vagrant/start-master.sh
 echo "service pe-puppet restart; service pe-httpd restart; tail -f /var/log/messages" > /home/vagrant/restart-master.sh
-chmod +x /home/vagrant/start-*.sh
+chmod +x /home/vagrant/*.sh
 /bin/env p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet PATH=/opt/puppet/bin:$PATH PS1="$1# " bash
