@@ -50,6 +50,7 @@ pename=puppet-enterprise-3.0.0-el-6-x86_64
 cat /vagrant/home/$pename.tar.gz | gzip -dc | tar -xvpf -
 
 echo pre-install.$1 >> /vagrant/home/progress
+SECONDS=0
 case "$1" in
   vm-puppetmaster)
     answerfile $1 y |tee /home/vagrant/answers.puppetmaster;
@@ -66,6 +67,7 @@ rm -rf /home/vagrant/modules
 mv /opt/puppet/share/puppet/modules /home/vagrant/modules
 echo done-install.$1 >> /vagrant/home/progress
 rpm -ivh /home/vagrant/$pename/packages/el-6-x86_64/pe-postgresql-*
+echo "It took $SECONDS for $1 install"
 case "$1" in
   vm-puppetmaster)
     /opt/puppet/bin/gem install librarian-puppet
