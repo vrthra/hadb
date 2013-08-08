@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |cx|
   [
-    {:name => 'vm-puppetmaster', :ip => '192.168.33.21', :mem => 2048},
+    {:name => 'vm-puppetmaster', :ip => '192.168.33.21', :mem => 4096},
     {:name => 'vm-pgmaster', :ip => '192.168.33.22', :mem => 512},
     {:name => 'vm-pgslave', :ip => '192.168.33.23', :mem => 512}
   ].each do |info|
