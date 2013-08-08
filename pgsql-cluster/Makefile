@@ -11,19 +11,17 @@ centospkg=http://mirror.centos.org/centos/6/os/x86_64/Packages/
 
 .PRECIOUS: home/$(pename).tar.gz mymodules home/$(bintmux) home/$(libevent)
 
-home: ; mkdir -p $@
-
 update:
 	echo > progress
 	echo true > $(myscript)
 	chmod +x $(myscript)
 	$(vagrant) provision
 
-home/$(libevent): | home
+home/$(libevent):
 	curl -L '$(centospkg)/$(libevent)' > home/$(libevent)
 home/$(bintmux): home/$(libevent)
 	curl -L '$(rpmforge)/$(bintmux)' > home/$(bintmux)
-home/$(pename).tar.gz: home
+home/$(pename).tar.gz:
 	curl -L '$(peurl)' > home/$(pename).tar.gz
 
 etc/modules/postgresql/.git:
@@ -47,7 +45,7 @@ init: home/$(pename).tar.gz mymodules home/$(bintmux)
 
 clobber:
 	$(vagrant) destroy -f
-	rm -rf home .vagrant
+	rm -rf home/* .vagrant
 
 destroyvms:
 	@for i in $$(VBoxManage list runningvms | sed -e 's#"##g' | awk -F\  '/pgsql-/{print $$1;}'); do echo VBoxManage controlvm $$i poweroff; done
