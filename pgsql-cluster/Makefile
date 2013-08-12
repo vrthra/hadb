@@ -55,7 +55,10 @@ clean:
 	$(vagrant) destroy -f
 	rm -rf home/modules
 
+lint=~/.gem/ruby/1.8/bin/puppet-lint --with-context --with-filename  --no-autoloader_layout-check --fail-on-warnings
+
 modulereinit:
+	$(lint) etc/modules/pe_postgresql/manifests/*.pp
 	vagrant ssh vm-puppetmaster -c 'sudo rm -rf /opt/puppet/share/puppet/modules /opt/puppet/share/puppet/Puppetfile.*'
 	vagrant ssh vm-puppetmaster -c 'cd /opt/puppet/share/puppet; sudo /opt/puppet/bin/librarian-puppet install'
 
