@@ -72,3 +72,12 @@ $(key): | mymodules
 	chmod 0755 etc/modules/pe_postgresql/files/.ssh
 	chmod 555  etc/modules/pe_postgresql/files/.ssh/*
 
+saveinst:
+	vagrant ssh vm-pgmaster -c 'sudo tar -cpf /vagrant/pgmaster.tar /usr/local/bin /etc/rc.d/init.d/pe-* /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet'
+	vagrant ssh vm-pgslave -c 'sudo tar -cpf /vagrant/pgslave.tar /usr/local/bin /etc/rc.d/init.d/pe-* /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet'
+
+restoreinst:
+	vagrant ssh vm-pgmaster -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	vagrant ssh vm-pgslave -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	vagrant ssh vm-pgmaster -c 'cd /; sudo rm -rf /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet ; sudo tar -xpf /vagrant/pgmaster.tar'
+	vagrant ssh vm-pgslave -c 'cd /; sudo rm -rf /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet ; sudo tar -xpf /vagrant/pgslave.tar'
