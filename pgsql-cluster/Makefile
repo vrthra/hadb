@@ -8,6 +8,7 @@ libevent=libevent-1.4.13-4.el6.x86_64.rpm
 bintmux=tmux-1.6-1.el5.rf.x86_64.rpm
 rpmforge=http://apt.sw.be/redhat/el5/en/x86_64/rpmforge/RPMS/
 centospkg=http://mirror.centos.org/centos/6/os/x86_64/Packages/
+key=etc/modules/pe_postgresql/files/.ssh/id_rsa
 
 .PRECIOUS: home/$(pename).tar.gz mymodules home/$(bintmux) home/$(libevent)
 
@@ -57,8 +58,14 @@ clean:
 
 lint=~/.gem/ruby/1.8/bin/puppet-lint --with-context --with-filename  --no-autoloader_layout-check --fail-on-warnings
 
-modulereinit:
+modulereinit: $(key)
 	$(lint) etc/modules/pe_postgresql/manifests/*.pp
 	vagrant ssh vm-puppetmaster -c 'sudo rm -rf /opt/puppet/share/puppet/modules /opt/puppet/share/puppet/Puppetfile.*'
 	vagrant ssh vm-puppetmaster -c 'cd /opt/puppet/share/puppet; sudo /opt/puppet/bin/librarian-puppet install'
+
+keygen: mymodules
+	rm -rf etc/modules/pe_postgresql/files/.ssh/
+	mkdir -p etc/modules/pe_postgresql/files/.ssh/
+	ssh-keygen -f etc/modules/pe_postgresql/files/.ssh/id_rsa -t rsa  -N ''
+	chmod -R 666 etc/modules/pe_postgresql/files/.ssh
 
