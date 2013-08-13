@@ -63,9 +63,10 @@ modulereinit: $(key)
 	vagrant ssh vm-puppetmaster -c 'sudo rm -rf /opt/puppet/share/puppet/modules /opt/puppet/share/puppet/Puppetfile.*'
 	vagrant ssh vm-puppetmaster -c 'cd /opt/puppet/share/puppet; sudo /opt/puppet/bin/librarian-puppet install'
 
-keygen: mymodules
+$(key): | mymodules
 	rm -rf etc/modules/pe_postgresql/files/.ssh/
 	mkdir -p etc/modules/pe_postgresql/files/.ssh/
 	ssh-keygen -f etc/modules/pe_postgresql/files/.ssh/id_rsa -t rsa  -N ''
-	chmod -R 666 etc/modules/pe_postgresql/files/.ssh
+	chmod 0755 etc/modules/pe_postgresql/files/.ssh
+	chmod 555  etc/modules/pe_postgresql/files/.ssh/*
 
