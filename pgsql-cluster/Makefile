@@ -56,8 +56,8 @@ clean:
 	$(vagrant) destroy -f
 	rm -rf home/modules
 
-lint=~/.gem/ruby/1.8/bin/puppet-lint --with-context --with-filename  --no-autoloader_layout-check --fail-on-warnings
-validate=~/.gem/ruby/1.8/bin/puppet parser validate
+lint=puppet-lint --with-context --with-filename  --no-autoloader_layout-check --fail-on-warnings
+validate=puppet parser validate
 
 modulereinit: $(key)
 	$(lint) etc/modules/pe_postgresql/manifests/*.pp
