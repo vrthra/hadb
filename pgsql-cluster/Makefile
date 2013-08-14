@@ -39,10 +39,14 @@ moduleupdate:
 
 mymodules: | etc/modules/postgresql/.git etc/modules/pe_postgresql/.git
 
+link:
+	$(sshp) -c 'sudo ln -s /etc/puppetlabs/puppet/manifests/site.pp /home/vagrant/site.pp'
+
 init: home/$(pename).tar.gz mymodules home/$(bintmux)
 	echo > progress
 	rm -f $(myscript) $(myscript).*
 	$(vagrant) up
+	$(MAKE) link
 
 clobber:
 	$(vagrant) destroy -f
@@ -64,6 +68,7 @@ modulereinit: $(key)
 	$(validate) etc/modules/pe_postgresql/manifests/*.pp
 	vagrant ssh vm-puppetmaster -c 'sudo rm -rf /opt/puppet/share/puppet/modules /opt/puppet/share/puppet/Puppetfile.*'
 	vagrant ssh vm-puppetmaster -c 'cd /opt/puppet/share/puppet; sudo /opt/puppet/bin/librarian-puppet install'
+	$(sshp) -c 'sudo /sbin/service pe-postgresql restart; sudo /sbin/service pe-puppet restart'
 
 $(key): | mymodules
 	rm -rf etc/modules/pe_postgresql/files/.ssh/
@@ -72,12 +77,24 @@ $(key): | mymodules
 	chmod 0755 etc/modules/pe_postgresql/files/.ssh
 	chmod 555  etc/modules/pe_postgresql/files/.ssh/*
 
+sshp=vagrant ssh vm-puppetmaster
+sshm=vagrant ssh vm-pgmaster
+sshs=vagrant ssh vm-pgslave
+puppetdirs=/opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet
+
 saveinst:
-	vagrant ssh vm-pgmaster -c 'sudo tar -cpf /vagrant/pgmaster.tar /usr/local/bin /etc/rc.d/init.d/pe-* /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet'
-	vagrant ssh vm-pgslave -c 'sudo tar -cpf /vagrant/pgslave.tar /usr/local/bin /etc/rc.d/init.d/pe-* /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet'
+	$(sshm) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	$(sshs) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	#$(sshp) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	$(sshm) -c 'sudo tar -cpf /vagrant/home/pgmaster.tar /usr/local/bin /etc/rc.d/init.d/pe-* $(puppetdirs)'
+	$(sshs) -c 'sudo tar -cpf /vagrant/home/pgslave.tar /usr/local/bin /etc/rc.d/init.d/pe-* $(puppetdirs)'
+	#$(sshp) -c 'sudo tar -cpf /vagrant/home/puppetmaster.tar /usr/local/bin /etc/rc.d/init.d/pe-* $(puppetdirs) /var/opt/lib/pe-puppetmaster'
 
 restoreinst:
-	vagrant ssh vm-pgmaster -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
-	vagrant ssh vm-pgslave -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
-	vagrant ssh vm-pgmaster -c 'cd /; sudo rm -rf /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet ; sudo tar -xpf /vagrant/pgmaster.tar'
-	vagrant ssh vm-pgslave -c 'cd /; sudo rm -rf /opt/puppet /etc/puppetlabs /var/opt/lib/pe-puppet ; sudo tar -xpf /vagrant/pgslave.tar'
+	$(sshm) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	$(sshs) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	#$(sshp) -c 'sudo /sbin/service pe-postgresql stop; sudo /sbin/service pe-puppet stop'
+	$(sshm) -c 'cd /; sudo rm -rf $(puppetdirs) ; sudo tar -xpf /vagrant/home/pgmaster.tar'
+	$(sshs) -c 'cd /; sudo rm -rf $(puppetdirs) ; sudo tar -xpf /vagrant/home/pgslave.tar'
+	#$(sshp) -c 'cd /; sudo rm -rf $(puppetdirs) /var/opt/lib/pe-puppetmaster ; sudo tar -xpf /vagrant/home/puppetmaster.tar'
+

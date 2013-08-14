@@ -74,6 +74,11 @@ case "$1" in
     export PATH=/opt/puppet/bin:$PATH
     ( cd /opt/puppet/share/puppet; cp /vagrant/etc/Puppetfile . ; /opt/puppet/bin/librarian-puppet install --verbose --clean)
     cp /vagrant/etc/site.pp /etc/puppetlabs/puppet/manifests/site.pp
+    echo "service pe-puppet stop; service pe-httpd stop; \
+      /opt/puppet/bin/puppet master --verbose --no-daemonize 2>&1 | tee /home/vagrant/master.log" \
+      > /home/vagrant/start-master.sh
+    echo "service pe-puppet restart; service pe-httpd restart; tail -f /var/log/messages" \
+      > /home/vagrant/restart-master.sh
     (while true;
     do echo "wait for sign:";
         case $(/opt/puppet/bin/puppet cert list | wc -l) in
@@ -83,6 +88,9 @@ case "$1" in
     done)
     ;;
   *)
+    echo "service pe-puppet stop; \
+      /opt/puppet/bin/puppet agent --verbose --no-daemonize 2>&1 | tee /home/vagrant/agent.log" \
+      > /home/vagrant/start-agent.sh
    (while true;
    do echo "wait for sign:";
       /opt/puppet/bin/puppet agent -t -w 10;
@@ -95,8 +103,53 @@ case "$1" in
 esac
 echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
-echo "service pe-puppet stop; /opt/puppet/bin/puppet agent --verbose --no-daemonize 2>&1 | tee /home/vagrant/agent.log" > /home/vagrant/start-agent.sh
-echo "service pe-puppet stop; service pe-httpd stop; /opt/puppet/bin/puppet master --verbose --no-daemonize 2>&1 | tee /home/vagrant/master.log" > /home/vagrant/start-master.sh
-echo "service pe-puppet restart; service pe-httpd restart; tail -f /var/log/messages" > /home/vagrant/restart-master.sh
 chmod +x /home/vagrant/*.sh
-/bin/env p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet PATH=/opt/puppet/bin:$PATH PS1="$1# " bash
+cat <<EOF > /etc/profile.d/puppet.sh
+export PATH=/opt/puppet/bin:$PATH
+p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet
+PS1="$1# "
+pg() {
+  PS1="$1| "
+  sudo -E -H -i -u pe-postgres /bin/bash
+}
+EOF
+case "$1" in
+  vm-pgmaster)
+  cat <<EOF > /opt/puppet/var/lib/pgsql/.bashrc
+check_wal() {
+  echo "WAL status in server"
+  psql -c "SELECT pg_current_xlog_location()"
+  ps -eaf | grep receiver
+}
+check_sql() {
+  [ -e .fake_customers ] || ( psql -c "CREATE TABLE fake_customers (name VARCHAR(32));" && touch .fake_customers )
+  psql -c "INSERT INTO fake_customers values ('\$(date)');"
+}
+back_to_master() {
+  cat slaves.info | sed -e 's#/32##g' > .masterip
+  ./bin/pg.backup $(<.masterip)
+  ./bin/recovery.conf.sh
+  touch .trigger
+}
+EOF
+  vm-pgslave)
+  cat <<EOF > /opt/puppet/var/lib/pgsql/.bashrc
+check_wal() {
+  echo "WAL status in client"
+  psql -c "select pg_last_xlog_receive_location()"
+  ps -eaf | grep sender
+}
+check_sql() {
+  psql -c "SELECT * from fake_customers;"
+}
+promote_to_master() {
+  touch .trigger
+  echo $(cat .masterip)/32 > slaves.info
+  psql -c "INSERT INTO fake_customers values ('\$(date)');" && echo "it worked."
+}
+
+EOF
+
+
+bash
+
