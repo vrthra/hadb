@@ -1,0 +1,23 @@
+#!/bin/bash
+_check_wal() {
+  echo "WAL status in server"
+  psql -c "SELECT pg_current_xlog_location()"
+  ps -eaf | grep receiver
+}
+_check_sql() {
+  [ -e .fake_customers ] || ( psql -c "CREATE TABLE fake_customers (name VARCHAR(32));" && touch .fake_customers )
+  psql -c "INSERT INTO fake_customers values ('\$(date)');"
+}
+_back_to_master() {
+  sudo service pe-postgresql stop
+  cat slaves.info | sed -e 's#/32##g' > .masterip
+  ./bin/pg.backup $(<.masterip)
+  # First we need this to be in standby mode. This is accomplished by
+  # creating the recovery.conf.
+  ./bin/recovery.conf.sh
+  sudo service pe-postgresql start
+  sleep 5
+  psql -c "select pg_last_xlog_receive_location()"
+  # Then flip the switch
+  touch .trigger
+}

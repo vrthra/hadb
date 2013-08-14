@@ -113,43 +113,14 @@ pg() {
   sudo -E -H -i -u pe-postgres /bin/bash
 }
 EOF
-case "$1" in
-  vm-pgmaster)
-  cat <<EOF > /opt/puppet/var/lib/pgsql/.bashrc
-check_wal() {
-  echo "WAL status in server"
-  psql -c "SELECT pg_current_xlog_location()"
-  ps -eaf | grep receiver
-}
-check_sql() {
-  [ -e .fake_customers ] || ( psql -c "CREATE TABLE fake_customers (name VARCHAR(32));" && touch .fake_customers )
-  psql -c "INSERT INTO fake_customers values ('\$(date)');"
-}
-back_to_master() {
-  cat slaves.info | sed -e 's#/32##g' > .masterip
-  ./bin/pg.backup $(<.masterip)
-  ./bin/recovery.conf.sh
-  touch .trigger
-}
+cat <<EOF > /etc/sudoers.d/pe-postgres
+pe-postgres        ALL=(ALL)       NOPASSWD: ALL
 EOF
-  vm-pgslave)
-  cat <<EOF > /opt/puppet/var/lib/pgsql/.bashrc
-check_wal() {
-  echo "WAL status in client"
-  psql -c "select pg_last_xlog_receive_location()"
-  ps -eaf | grep sender
-}
-check_sql() {
-  psql -c "SELECT * from fake_customers;"
-}
-promote_to_master() {
-  touch .trigger
-  echo $(cat .masterip)/32 > slaves.info
-  psql -c "INSERT INTO fake_customers values ('\$(date)');" && echo "it worked."
-}
+sudo chmod 400 /etc/sudoers.d/pe-postgres
 
+cat <<EOF > /opt/puppet/var/lib/pgsql/.bashrc
+[ -e /vagrant/etc/bashrc.$1 ] && . /vagrant/etc/bashrc.$1
 EOF
-
 
 bash
 
