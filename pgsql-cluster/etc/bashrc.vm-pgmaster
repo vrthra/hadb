@@ -10,6 +10,7 @@ _check_sql() {
 }
 _back_to_master() {
   sudo service pe-postgresql stop
+  rm -rf /opt/puppet/var/lib/pgsql/9.2/wal_archive; mkdir -p /opt/puppet/var/lib/pgsql/9.2/wal_archive
   cat slaves.info | sed -e 's#/32##g' > .masterip
   ./bin/pg.backup $(<.masterip)
   # First we need this to be in standby mode. This is accomplished by
@@ -20,6 +21,5 @@ _back_to_master() {
   psql -c "select pg_last_xlog_receive_location()"
   # Then flip the switch
   touch .trigger
-  ssh $(<.masterip) 'touch .restart'
 }
 export PS1='master| '
