@@ -51,6 +51,7 @@ $ vagrant ssh vm-pgslave
 > wait for it to finish catalog run, then ^c.
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
 > You can check the progress of this at the master log console.
+> wait for 'LOG:  streaming replication successfully connected to primary'
 > take a new window, and switch to pgsql user (use pg command)
 ^b c
 # pg
