@@ -16,7 +16,7 @@ Further steps:
 
 * Connect to vm-puppetmaster
 
-$ vagrant ssh vm-puppetmaster
+    $ vagrant ssh vm-puppetmaster
     # sudo tmux attach -d
     # edit site.pp
     > remove the comment chars from beginning.
