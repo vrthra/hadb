@@ -33,7 +33,10 @@ $ vagrant ssh vm-pgmaster
 # ./start-agent.sh
 > wait for it to finish the catalog run, then ^c.
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
-> take a new window in tmux and switch to pgsql user
+> take a new window in tmux and switch to pgsql user 
+> you can go back to the log tail window to monitor slave progress
+> you may have to wait for a minute while the cron kicks off 
+> no entry present in hba is normal.
 ^b c
 # pg
 |
@@ -47,7 +50,8 @@ $ vagrant ssh vm-pgslave
 # ./start-agent.sh
 > wait for it to finish catalog run, then ^c.
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
-> take a new window, and swithc to pgsql user (use pg command)
+> You can check the progress of this at the master log console.
+> take a new window, and switch to pgsql user (use pg command)
 ^b c
 # pg
 |
