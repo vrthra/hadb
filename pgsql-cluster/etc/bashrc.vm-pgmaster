@@ -20,4 +20,5 @@ _back_to_master() {
   psql -c "select pg_last_xlog_receive_location()"
   # Then flip the switch
   touch .trigger
+  ssh $(<.masterip) 'touch .restart'
 }
