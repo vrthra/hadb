@@ -19,11 +19,10 @@ Further steps:
 ```
 $ vagrant ssh vm-puppetmaster
 # sudo tmux attach -d
-# edit site.pp
 ```
-
-Remove the comment chars from beginning.
+Enable pe-postgresql cluster
 ```
+# /vagrant/home/enable_db.sh
 # ./restart-master.sh
 ```
 Wait for it to finish the catalog run.
@@ -37,16 +36,15 @@ $ vagrant ssh vm-pgmaster
 # ./start-agent.sh
 ```
 Wait for it to finish the catalog run, then ^c.
+Switch to pgsql user
+
 ```
-# tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
-```
-Take a new window in tmux and switch to pgsql user
-you can go back to the log tail window to monitor slave progress
-you may have to wait for a minute while the cron kicks off
-```
-^b c
 # pg
 master|
+```
+You can monitor the database log by
+```
+master| _log
 ```
 
 * Connect to vm-pgslave
@@ -57,9 +55,12 @@ $ vagrant ssh vm-pgslave
 # ./start-agent.sh
 ```
 Wait for it to finish catalog run, then ^c.
+Then switch to pgsql user, and monitor the log
 ```
-# tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
+# pg
+slave| _log
 ```
+
 You can check the progress of this at the master log console.
 At the server, 'No entry present in hba' is normal, but if it takes too long,
 inspect '/var/log/cron' for a line that executes
@@ -70,14 +71,10 @@ if it exists, and it takes too long then execute
   /opt/puppet/var/lib/pgsql/bin/restart.check
 manually as root.
 Wait for 'LOG:  streaming replication successfully connected to primary'
-take a new window, and switch to pgsql user (use pg command)
-```
-^b c
-# pg
-slave|
-```
 
 * Check WAL
+
+Create new windows with tmux, switch to pgsql user with pg in both master and slave then,
 
 ```
 master| _check_wal

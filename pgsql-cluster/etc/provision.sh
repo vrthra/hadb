@@ -109,7 +109,6 @@ export PATH=/opt/puppet/bin:$PATH
 p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet
 PS1="$1# "
 pg() {
-  PS1="$1| "
   sudo -E -H -i -u pe-postgres /bin/bash
 }
 EOF

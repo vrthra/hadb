@@ -12,13 +12,16 @@ _to_standby() {
   echo "Going to become standby."
   sudo service pe-postgresql stop
   rm -rf /opt/puppet/var/lib/pgsql/9.2/wal_archive; mkdir -p /opt/puppet/var/lib/pgsql/9.2/wal_archive
+  echo "Register ourselves."
   cat slaves.info | sed -e 's#/32##g' > .masterip
-  ./bin/pg.backup $(<.masterip)
+  ssh $(<.masterip) 'echo $(cat .masterip)/32 > slaves.info'
+  echo "> Wal Archiving would not be enabled in the server if it was a standby failover."
+  ssh $(<.masterip) 'sudo service pe-postgresql restart'
+  ssh $(<.masterip) './bin/pg.backup $(<.masterip)'
   # creating the recovery.conf.
   ./bin/recovery.conf.sh
   sudo service pe-postgresql start
   psql -c "select pg_last_xlog_receive_location()"
-  sleep 5
 }
 _back_to_master() {
   # First we need this to be in standby mode. This is accomplished by
