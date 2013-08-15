@@ -9,10 +9,6 @@ _check_sql() {
   psql -c "SELECT * from fake_customers;"
 }
 _promote_to_master() {
-  # First make sure that we wont croak when no slaves are found for archive.
-  echo 127.0.0.1/32 > slaves.info
-  sudo service pe-postgresql restart
-  sleep 5
   touch .trigger
   sleep 5
   psql -c "INSERT INTO fake_customers values ('$(date)');" && echo "it worked."

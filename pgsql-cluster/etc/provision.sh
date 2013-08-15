@@ -105,7 +105,7 @@ echo done.$1 >> /vagrant/home/progress
 echo "Shell for $1"
 chmod +x /home/vagrant/*.sh
 cat <<EOF > /etc/profile.d/puppet.sh
-export PATH=/opt/puppet/bin:$PATH
+export PATH=/opt/puppet/bin:/vagrant/home:$PATH
 p_conf=/etc/puppetlabs/puppet p_dir=/opt/puppet/share/puppet
 PS1="$1# "
 pg() {
