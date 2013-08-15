@@ -47,7 +47,7 @@ you may have to wait for a minute while the cron kicks off
 ```
 ^b c
 # pg
-|
+master|
 ```
 
 * Connect to vm-pgslave
@@ -67,7 +67,7 @@ take a new window, and switch to pgsql user (use pg command)
 ```
 ^b c
 # pg
-pg|
+slave|
 ```
 
 * Check WAL
@@ -90,10 +90,12 @@ master| _check_sql
 ```
 slave| _promote_to_master
 ```
+It tries to trigger a failover, updates the slave ip to the previous master, and tries to insert a row.
 
 * Trigger remastering
 
 ```
 master| _back_to_master
 ```
-
+Shuts down the pe-postgresql service, then brings it up as a standby after updating the db, restarts the service,
+triggers a restart in slave
