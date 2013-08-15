@@ -20,10 +20,14 @@ Further steps:
 $ vagrant ssh vm-puppetmaster
 # sudo tmux attach -d
 # edit site.pp
-> remove the comment chars from beginning.
-# ./restart-master.sh
-> wait for it to finish the catalog run.
 ```
+
+Remove the comment chars from beginning.
+```
+# ./restart-master.sh
+```
+Wait for it to finish the catalog run.
+
 
 * Connect to vm-pgmaster
 
@@ -31,12 +35,16 @@ $ vagrant ssh vm-puppetmaster
 $ vagrant ssh vm-pgmaster
 # sudo tmux attach -d
 # ./start-agent.sh
-> wait for it to finish the catalog run, then ^c.
+```
+Wait for it to finish the catalog run, then ^c.
+```
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
-> take a new window in tmux and switch to pgsql user 
-> you can go back to the log tail window to monitor slave progress
-> you may have to wait for a minute while the cron kicks off 
-> no entry present in hba is normal.
+```
+Take a new window in tmux and switch to pgsql user 
+you can go back to the log tail window to monitor slave progress
+you may have to wait for a minute while the cron kicks off 
+'No entry present in hba is normal'.
+```
 ^b c
 # pg
 |
@@ -48,49 +56,44 @@ $ vagrant ssh vm-pgmaster
 $ vagrant ssh vm-pgslave
 # sudo tmux attach -d
 # ./start-agent.sh
-> wait for it to finish catalog run, then ^c.
+```
+Wait for it to finish catalog run, then ^c.
+```
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
-> You can check the progress of this at the master log console.
-> wait for 'LOG:  streaming replication successfully connected to primary'
-> take a new window, and switch to pgsql user (use pg command)
+```
+You can check the progress of this at the master log console.
+Wait for 'LOG:  streaming replication successfully connected to primary'
+take a new window, and switch to pgsql user (use pg command)
+```
 ^b c
 # pg
-|
+pg|
 ```
 
-* On master
+* Check WAL
 
 ```
-| _check_wal
+master| _check_wal
+ slave| _check_wal
 ```
+This verifes that receiver process is listening, and wal records are in sync.
 
-* On slave
-
-```
-| _check_wal
-```
-
-* On master
+* Create a table, and insert a row, verify it is accessible in both.
 
 ```
-| _check_sql
+master| _check_sql
+ slave| _check_sql
 ```
 
-* On slave
+* Trigger mastering
 
 ```
-| _check_sql
+slave| _promote_to_master
 ```
 
-* On slave again, trigger mastering
+* Trigger remastering
 
 ```
-| _promote_to_master
-```
-
-* On master again, trigger remastering
-
-```
-| _back_to_master
+master| _back_to_master
 ```
 
