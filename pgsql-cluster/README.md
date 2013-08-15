@@ -40,10 +40,9 @@ Wait for it to finish the catalog run, then ^c.
 ```
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
 ```
-Take a new window in tmux and switch to pgsql user 
+Take a new window in tmux and switch to pgsql user
 you can go back to the log tail window to monitor slave progress
-you may have to wait for a minute while the cron kicks off 
-'No entry present in hba is normal'.
+you may have to wait for a minute while the cron kicks off
 ```
 ^b c
 # pg
@@ -62,6 +61,14 @@ Wait for it to finish catalog run, then ^c.
 # tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
 ```
 You can check the progress of this at the master log console.
+At the server, 'No entry present in hba' is normal, but if it takes too long,
+inspect '/var/log/cron' for a line that executes
+  /opt/puppet/var/lib/pgsql/bin/restart.check
+If it has executed already, then check for existance of
+  /opt/puppet/var/lib/pgsql/.restart
+if it exists, and it takes too long then execute
+  /opt/puppet/var/lib/pgsql/bin/restart.check
+manually as root.
 Wait for 'LOG:  streaming replication successfully connected to primary'
 take a new window, and switch to pgsql user (use pg command)
 ```

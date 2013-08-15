@@ -1,25 +1,35 @@
 #!/bin/bash
 _check_wal() {
+  ps -eaf | grep sender
   echo "WAL status in server"
-  psql -c "SELECT pg_current_xlog_location()"
-  ps -eaf | grep receiver
+  psql -c "SELECT pg_xlog_location_diff(pg_current_xlog_location(), '0/0') AS offset;"
 }
 _check_sql() {
   [ -e .fake_customers ] || ( psql -c "CREATE TABLE fake_customers (name VARCHAR(32));" && touch .fake_customers )
-  psql -c "INSERT INTO fake_customers values ('\$(date)');"
+  psql -c "INSERT INTO fake_customers values ('$(date)');"
 }
-_back_to_master() {
+_to_standby() {
+  echo "Going to become standby."
   sudo service pe-postgresql stop
   rm -rf /opt/puppet/var/lib/pgsql/9.2/wal_archive; mkdir -p /opt/puppet/var/lib/pgsql/9.2/wal_archive
   cat slaves.info | sed -e 's#/32##g' > .masterip
   ./bin/pg.backup $(<.masterip)
-  # First we need this to be in standby mode. This is accomplished by
   # creating the recovery.conf.
   ./bin/recovery.conf.sh
   sudo service pe-postgresql start
-  sleep 5
   psql -c "select pg_last_xlog_receive_location()"
+  sleep 5
+}
+_back_to_master() {
+  # First we need this to be in standby mode. This is accomplished by
+  _to_standby
+  echo "Going to become master."
   # Then flip the switch
   touch .trigger
+  sleep 5
+  psql -c "INSERT INTO fake_customers values ('$(date)');" && echo "it worked."
+}
+_log() {
+   tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
 }
 export PS1='master| '

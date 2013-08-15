@@ -1,16 +1,22 @@
 #!/bin/bash
 _check_wal() {
+  ps -eaf | grep receiver
   echo "WAL status in client"
-  psql -c "select pg_last_xlog_receive_location()"
-  ps -eaf | grep sender
+  psql -c "SELECT pg_xlog_location_diff(pg_last_xlog_receive_location(), '0/0') AS receive, \
+                  pg_xlog_location_diff(pg_last_xlog_replay_location(), '0/0') AS replay;"
 }
 _check_sql() {
   psql -c "SELECT * from fake_customers;"
 }
 _promote_to_master() {
   echo $(cat .masterip)/32 > slaves.info
+  sudo service pe-postgresql restart
+  sleep 5
   touch .trigger
   sleep 5
-  psql -c "INSERT INTO fake_customers values ('\$(date)');" && echo "it worked."
+  psql -c "INSERT INTO fake_customers values ('$(date)');" && echo "it worked."
+}
+_log() {
+   tail -f /opt/puppet/var/lib/pgsql/9.2/data/pg_log/*.log
 }
 export PS1='slave| '
