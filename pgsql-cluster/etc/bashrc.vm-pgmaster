@@ -22,3 +22,4 @@ _back_to_master() {
   touch .trigger
   ssh $(<.masterip) 'touch .restart'
 }
+export PS1='master| '

@@ -13,4 +13,4 @@ _promote_to_master() {
   sleep 5
   psql -c "INSERT INTO fake_customers values ('\$(date)');" && echo "it worked."
 }
-
+export PS1='slave| '
